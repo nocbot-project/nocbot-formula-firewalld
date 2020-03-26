@@ -1,0 +1,19 @@
+# Start imports
+{% import_yaml "firewalld/defaults.yaml" as defaults %}
+{% import_yaml "firewalld/osfamilymap.yaml" as osfamilymap %}
+{% import_yaml "firewalld/osmap.yaml" as osmap %}
+
+# merge the osfamilymap
+{% set osfamily = salt['grains.filter_by'](osfamilymap, grain='os_family') or{} %}
+{% do salt['defaults.merge'](defaults['firewalld'], osfamily) %}
+
+# merge the osmap
+{% set osmap = salt['grains.filter_by'](osmap, grain='os') or{} %}
+{% do salt['defaults.merge'](defaults['firewalld'], osmap) %}
+
+# merge the lookup
+{% set lookup = salt['pillar.get']('firewalld:lookup', default={}, merge=True) %}
+{% do salt['defaults.merge'](defaults['firewalld'], lookup) %}
+
+# Merge in salt pillar
+{% set firewalld = salt['pillar.get']('firewalld', default=defaults['firewalld'], merge=True) %}

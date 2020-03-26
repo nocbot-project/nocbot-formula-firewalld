@@ -1,0 +1,10 @@
+# Order matters
+export vagrant_tld_firewalld="test"
+export vagrant_domain_firewalld="nocbot.$vagrant_tld_firewalld"
+
+# Order does not matter
+export vagrant_box_cpus_firewalld="2"
+export vagrant_box_memory_firewalld="1024"
+export vagrant_box_version_firewalld="8.1.1911"
+export vagrant_box_firewalld="nocbot/centos-8"
+export vagrant_ip_addr_firewalld="172.16.0"

@@ -1,0 +1,14 @@
+---
+
+# Non OS specific defaults belong here
+# OS specific defaults belong in one of the OS maps
+
+firewalld:
+  enabled: False
+  started: False
+
+  block_icmp: []
+  services: []
+  zones: []
+
+...

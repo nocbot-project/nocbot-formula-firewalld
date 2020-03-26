@@ -1,0 +1,87 @@
+---
+
+environment: devmode
+
+classes:
+  - default.devmode
+
+states:
+  - salt
+
+pillars:
+  salt:
+    lookup:
+      master:
+        enabled: True
+        auto_sign: True
+        auto_sign_path: /etc/salt/autosign.conf
+        auto_sign_content: |
+          salt
+          minion-*
+        environment: devmode
+        fileserver_backend:
+          - gitfs
+        formulas:
+          # This is the formula being developed.
+          # It has nothing to do with gitfs
+          file_roots:
+            - firewalld
+          integration: []
+          testing: []
+          staging: []
+          production: []
+          # Formula being developed dependencies.
+          # They must reside on the local filesystem.
+          # They are being accessed as gitfs_remotes using the master branch.
+          devmode:
+            - salt
+        gitfs_base: salt
+        peer_modules:
+          - network.ip_addrs
+          - x509.sign_remote_certificate
+          - vault.generate_token
+        pillar:
+          engine: saltclass
+        pkg: salt-master
+        python_git: python3-GitPython
+        reactors:
+          salt/fileserver/gitfs/update: /srv/salt/reactor/update_fileserver.sls
+        rsa_private: |
+          -----BEGIN RSA PRIVATE KEY-----
+          ..
+          -----END RSA PRIVATE KEY-----
+        rsa_public: ssh-rsa AAAABBBBCCCC
+        service: salt-master
+      minion:
+        enabled: True
+        id: salt
+      salt_ssh:
+        pkg: salt-ssh
+        enabled: True
+  firewalld:
+    lookup:
+      enabled: True
+      started: True
+      services:
+        salt-master:
+          ports:
+            - 4505/tcp
+            - 4506/tcp
+      zones:
+        public:
+          is_default: True
+          prune_block_icmp: True
+          prune_ports: True
+          prune_services: True
+          block_icmp:
+            - echo-reply
+            - echo-request
+          ports:
+            - 80/tcp
+            - 8080/tcp
+          rich_rules:
+            - 'rule family="ipv4" source address="172.16.0.0/24" service name="salt-master" accept'
+            - 'rule family="ipv4" source address="172.16.0.0/24" service name="ssh" accept'
+            - 'rule family="ipv4" source address="10.0.2.0/24" service name="ssh" accept'
+            - 'rule family="ipv4" source address="10.10.73.0/24" service name="ssh" accept'
+...

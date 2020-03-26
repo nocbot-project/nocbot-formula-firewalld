@@ -1,0 +1,84 @@
+# -*- mode: ruby -*-
+
+# This Vagrantfile exists to support Nocbot Ansible Role and
+# SaltStack Formula development on macOS workstations
+
+# https://app.vagrantup.com/nocbot
+
+# These environment variables must be set via your shell
+# An example direnv .envrc is provided as .envrc.example
+box = ENV["vagrant_box_firewalld"]
+box_version = ENV["vagrant_box_version_firewalld"]
+domain = ENV["vagrant_domain_firewalld"]
+ip_addr = ENV["vagrant_ip_addr_firewalld"]
+tld = ENV["vagrant_tld_firewalld"]
+memory = ENV["vagrant_box_memory_firewalld"]
+cpus = ENV["vagrant_box_cpus_firewalld"]
+
+minion_name = "minion"
+
+required_plugins = %w( salty-vagrant-grains vagrant-cachier vagrant-dns )
+required_plugins.each do |plugin|
+    exec "vagrant plugin install #{plugin};vagrant #{ARGV.join(" ")}" unless Vagrant.has_plugin? plugin || ARGV[0] == 'plugin'
+end
+
+Vagrant.configure("2") do |config|
+
+  # NFS is mandatory do not uncomment this
+  # config.nfs.functional = false
+
+  config.vm.define :salt, primary: true do |salt_master|
+
+    salt_master.dns.tld = "#{tld}"
+    salt_master.dns.patterns = /^.*salt.#{domain}$/
+
+    salt_master.vm.provider "virtualbox" do |vm_config, override|
+      vm_config.customize ["modifyvm", :id, "--cpus", "#{cpus}"]
+      vm_config.customize ["modifyvm", :id, "--memory", "#{memory}"]
+      vm_config.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      vm_config.customize ['modifyvm', :id, "--ioapic", "on"]
+    end
+
+    salt_master.vm.box = "#{box}"
+    salt_master.vm.box_version = "#{box_version}"
+    salt_master.vm.host_name = "salt.#{domain}"
+    salt_master.vm.network "private_network", ip: "#{ip_addr}.10"
+
+    # Setup synced folders using nfs
+    salt_master.vm.synced_folder ".", "/vagrant", disabled: true
+    salt_master.vm.synced_folder "..", "/srv/formulas", type: "nfs"
+    salt_master.vm.synced_folder "dev/saltclass", "/srv/saltclass", type: "nfs"
+    salt_master.vm.synced_folder "dev/scripts", "/root/bin", type: "nfs"
+
+    # Keep most things in bootstrap.sh, keep vagrant things in this Vagrantfile
+    salt_master.vm.provision "shell", path: "dev/scripts/bootstrap.sh"
+  end
+
+  MINION_COUNT = 2
+
+  (1..MINION_COUNT).each do |minion_id|
+    config.vm.define "#{minion_name}-0#{minion_id}" do |salt_minion|
+
+      salt_minion.dns.tld = "#{tld}"
+      salt_minion.dns.patterns = /^.*#{minion_name}-0#{minion_id}.#{domain}$/
+
+      salt_minion.vm.provider "virtualbox" do |vm_config, override|
+        vm_config.customize ["modifyvm", :id, "--cpus", "#{cpus}"]
+        vm_config.customize ["modifyvm", :id, "--memory", "#{memory}"]
+        vm_config.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        vm_config.customize ['modifyvm', :id, "--ioapic", "on"]
+      end
+
+      salt_minion.vm.box = "#{box}"
+      salt_minion.vm.box_version = "#{box_version}"
+      salt_minion.vm.host_name = "#{minion_name}-0#{minion_id}.#{domain}"
+      salt_minion.vm.network "private_network", ip: "#{ip_addr}.1#{minion_id}"
+
+      # Setup synced folders
+      salt_minion.vm.synced_folder ".", "/vagrant", disabled: true
+
+      # Keep most things in bootstrap.sh, keep vagrant things in this Vagrantfile
+      salt_minion.vm.provision "shell", path: "dev/scripts/bootstrap.sh"
+    end
+  end
+end

@@ -1,0 +1,16 @@
+.kitchen.local.yml
+.vagrant.kitchen/
+.kitchen/
+.vagrant/
+.venv/
+.envrc
+.env
+*.swp
+*.pyc
+*~
+Gemfile.lock
+tests/build/
+.idea/
+.vscode/
+*.sublime*
+Vagrantfile

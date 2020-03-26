@@ -1,0 +1,7 @@
+---
+
+RedHat:
+  pkg_name: firewalld
+  service: firewalld
+
+...

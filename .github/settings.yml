@@ -1,0 +1,11 @@
+---
+
+repository:
+  description: Saltstack formula that manages firewalld.
+  homepage: https://nocbot.org/
+
+collaborators:
+  - username: mantoso-ci
+    permission: pull
+
+...

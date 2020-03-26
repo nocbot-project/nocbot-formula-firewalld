@@ -1,0 +1,23 @@
+---
+
+environment: devmode
+
+classes:
+  - default.devmode
+
+states:
+  - salt
+  - firewalld
+
+pillars:
+  salt:
+    lookup:
+      minion:
+        enabled: True
+        id: minion-01
+  firewalld:
+    lookup:
+      enabled: True
+      started: True
+
+...

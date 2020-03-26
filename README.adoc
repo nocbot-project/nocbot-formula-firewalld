@@ -1,0 +1,77 @@
+= image:https://avatars0.githubusercontent.com/u/47981569?s=100&v=4[Nocbot,link=https://github.com/nocbot-project] Firewalld SaltStack Formula
+// URI's
+:uri-nocbot-project: https://nocbot.org
+:uri-semver: http://semver.org
+:uri-editorconfig: http://editorconfig.org
+:uri-mantoso: https://mantoso.com
+:toc:
+:toc-placement: preamble
+
+[.lead]
+This SaltStack formula is a component of the {uri-nocbot-project}[Nocbot Project].
+
+[NOTE]
+====
+- Nocbot SaltStack Formula are intended to be used with `gitfs` and `saltclass`
+- This is an {uri-editorconfig}[editorconfig] enabled repository.
+- Formula and Salt Package Manger versioning follows {uri-semver}[Semantic Versioning] guidelines.
+====
+
+You should never rely on a repository you do not control for your infrastructure management. *We strongly recommend forking this formula repository* into your own account to avoid unexpected changes to your infrastructure.
+
+Our SaltStack formulas are highly active repositories be sure to pull new changes with care. Any additions you make to your fork can be easily sent back upstream with a quick pull request!
+
+== Features At A Glance
+
+- Installs firewalld
+
+== Supported Operating Systems
+
+- CentOS 8
+
+== Available States
+
+=== `firewalld.install`
+
+Installs firewalld when enabled in saltclass data.
+
+=== `firewalld.config`
+
+Configures firewalld when enabled in saltclass data.
+
+=== `firewalld.service`
+
+Installs firewalld when enabled in saltclass data.
+
+== Formula Usage
+
+To use this formula include a `firewalld` lookup in your saltclass node or class pillar data:
+
+[source,yaml]
+----
+pillars:
+  firewalld:
+    lookup:
+      enabled: True
+----
+
+=== Saltclass data
+
+[cols="<,<,<,<,<"]
+|===
+| Name | Description | Type | Default | Required
+| | |Number | |No
+| | |String | |Yes
+| | |Boolean | |No
+|===
+
+== Formula Dependencies
+
+- `nocbot-formula-firewalld`
+- `nocbot-formula-salt`
+
+== About Mantoso
+
+This SaltStack formula is maintained and funded by {uri-mantoso}[Mantoso]. Mantoso specializes in cloud infrastructure & automation.
+
+If you require link:../../SUPPORT.adoc[Priority Support] for your project, please contact us.

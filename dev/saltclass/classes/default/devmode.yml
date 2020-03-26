@@ -1,0 +1,15 @@
+---
+
+states:
+  - salt
+  - firewalld
+
+pillars:
+  salt:
+    lookup:
+      minion:
+        environment: devmode
+        master: salt.nocbot.test
+        service: salt-minion
+
+...

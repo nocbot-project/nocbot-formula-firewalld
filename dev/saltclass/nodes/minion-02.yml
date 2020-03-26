@@ -1,0 +1,18 @@
+---
+
+environment: devmode
+
+classes:
+  - default.devmode
+
+states:
+  - salt
+
+pillars:
+  salt:
+    lookup:
+      minion:
+        enabled: True
+        id: minion-02
+
+...
